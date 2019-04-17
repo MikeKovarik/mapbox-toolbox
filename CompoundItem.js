@@ -68,9 +68,8 @@ export class CompoundItem extends EventEmitter {
 		this.optionsReady = true
 
 		var Class = this.constructor
-		var setters = Class.setters || {}
-		var paintAliases = Class.paint || {}
-		var layoutAliases = Class.layout || {}
+		var paintProps  = Class.paint  || []
+		var layoutProps = Class.layout || []
 
 		this.layerOptions = Object.assign(this.layerOptions || {}, {
 			id: this.id,
@@ -83,13 +82,12 @@ export class CompoundItem extends EventEmitter {
 
 		for (let [key, value] of Object.entries(this.options)) {
 			// transform current value
-			if (setters[key]) value = setters[key](value)
 			if (value === undefined || value === null) continue
-			if (layoutAliases[key]) {
-				var prop = layoutAliases[key]
+			if (layoutProps[key]) {
+				var prop = layoutProps[key]
 				this.layerOptions.layout[prop] = value
-			} else if (paintAliases[key]) {
-				var prop = paintAliases[key]
+			} else if (paintProps[key]) {
+				var prop = paintProps[key]
 				this.layerOptions.paint[prop] = value
 			}
 		}

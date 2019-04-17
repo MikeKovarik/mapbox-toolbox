@@ -24,21 +24,11 @@ export class Point extends CompoundItem {
 
 	static type = 'circle'
 
-	static paint = {
-		size: 'circle-radius',
-		radius: 'circle-radius',
-		color: 'circle-color',
-		opacity: 'circle-opacity',
-	}
-
-	static setters = {
-		color: getColor,
-		size: size => size / 2,
-	}
-
-	static getters = {
-		size: radius => radius * 2,
-	}
+	static paint = [
+		'circle-radius',
+		'circle-color',
+		'circle-opacity',
+	]
 
 	paint = {
 		'circle-radius': 8,

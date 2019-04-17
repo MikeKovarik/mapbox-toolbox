@@ -1,19 +1,15 @@
 import {CompoundItem} from './CompoundItem.js'
-import {isGeoJson, getColor, getStyle} from './util.js'
+import {isGeoJson} from './util.js'
 
 
 export class Polygon extends CompoundItem {
 
 	static type = 'fill'
 
-	static paint = {
-		color: 'fill-color',
-		opacity: 'fill-opacity',
-	}
-
-	static setters = {
-		color: getColor,
-	}
+	static paint = [
+		'fill-color',
+		'fill-opacity',
+	]
 
 	paint = {
 		'fill-opacity': 0.1,

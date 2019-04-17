@@ -6,20 +6,19 @@ export class Label extends CompoundItem {
 
 	static type = 'symbol'
 
-	static layout = {
-		text: 'text-field',
-		size: 'text-size',
-	}
+	static layout = [
+		'text-field',
+		'text-size',
+	]
 
-	static paint = {
-		color: 'text-color',
-		opacity: 'text-opacity',
-	}
+	static paint = [
+		'text-color',
+		'text-opacity',
+	]
 
 	constructor(...args) {
 		super(...args)
 		var data = this.sourceOptions.data
-		console.log('this.sourceOptions.data',this.sourceOptions.data)
 		if (data.geometry.type === 'LineString') {
 			let line = data
 			let length = turf.length(line)

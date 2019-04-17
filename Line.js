@@ -18,19 +18,18 @@ export class Line extends CompoundItem {
 
 	static type = 'line'
 
-	static paintProps = ['line-width', 'line-width', 'line-color', 'line-opacity', 'line-gradient']
-	static layoutProps = ['line-cap', 'line-join', 'line-dasharray']
+	static paint = [
+		'line-width',
+		'line-width',
+		'line-color',
+		'line-opacity',
+	]
 
-	static paint = {
-		size: 'line-width',
-		width: 'line-width',
-		color: 'line-color',
-		opacity: 'line-opacity',
-	}
-
-	static setters = {
-		color: getColor,
-	}
+	static layout = [
+		'line-cap',
+		'line-join',
+		'line-dasharray'
+	]
 
 	paint = {
 		'line-width': VARIABLE_WIDTH,

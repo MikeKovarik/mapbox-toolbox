@@ -14,33 +14,25 @@ createGetters(Polygon)
 createGetters(Label)
 
 function createGetters(Class) {
-	var setters = Class.setters || {}
-	var getters = Class.getters || {}
-	var paintAliases = Class.paint || {}
-	var layoutAliases = Class.layout || {}
-	var passthrough = data => data
+	var setters = Class.setters || []
+	var getters = Class.getters || []
 	var descriptors = {}
-	for (let [key, prop] of Object.entries(paintAliases)) {
-		let getModifier = getters[key] || passthrough
-		let setModifier = setters[key] || passthrough
-		descriptors[key] = {
-			get() {
-				return getModifier(this.layer.getPaintProperty(prop))
-			},
-			set(value) {
-				this.map.setPaintProperty(this.id, prop, setModifier(value))
+	if (Class.paint) {
+		console.log('Class.paint', Class.paint)
+		for (let prop of Class.paint) {
+			let key = prop.split('-').pop()
+			descriptors[key] = {
+				get() {return this.layer.getPaintProperty(prop)},
+				set(value) {this.map.setPaintProperty(this.id, prop, value)}
 			}
 		}
 	}
-	for (let [key, prop] of Object.entries(layoutAliases)) {
-		let getModifier = getters[key] || passthrough
-		let setModifier = setters[key] || passthrough
-		descriptors[key] = {
-			get() {
-				return getModifier(this.layer.getLayoutProperty(prop))
-			},
-			set(value) {
-				this.map.setLayoutProperty(this.id, prop, setModifier(value))
+	if (Class.layout) {
+		for (let prop of Class.layout) {
+			let key = prop.split('-').pop()
+			descriptors[key] = {
+				get() {return this.layer.getLayoutProperty(prop)},
+				set(value) {this.map.setLayoutProperty(this.id, prop, value)}
 			}
 		}
 	}
