@@ -1,0 +1,24 @@
+{
+  "name": "mapbox-toolbar",
+  "version": "0.0.1",
+  "description": "Sugar coating for Mapbox GL APIs",
+  "author": "Mike Kovarik",
+  "license": "MIT",
+  "bugs": "https://github.com/MikeKovarik/mapbox-toolbox/issues/",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/MikeKovarik/mapbox-toolbox.git"
+  },
+  "scripts": {
+    "dev": "rollup -c rollup.config.dev.js -w",
+    "build": "rollup -c rollup.config.prod.js"
+  },
+  "dependencies": {
+    "turf": "^7.0.0"
+  },
+  "devDependencies": {
+    "rollup": "^0.59.4",
+    "rollup-plugin-notify": "^1.0.1",
+    "rollup-plugin-uglify-es": "0.0.1"
+  }
+}

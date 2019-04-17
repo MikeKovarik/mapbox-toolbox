@@ -1,0 +1,13 @@
+# Ignore everything
+*
+.*
+
+# Except for
+!index.js
+!index.mjs
+!browser.mjs
+!etc.mjs
+!formfactor.mjs
+!os.mjs
+!runtime.mjs
+!util.mjs
