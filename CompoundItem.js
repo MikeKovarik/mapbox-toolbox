@@ -41,7 +41,7 @@ export class CompoundItem extends EventEmitter {
 		this.sourceOptions = {data, type: 'geojson'}
 	}
 
-	// TODO: detect paint/layout with the new static arrays
+	// TODO: merge with _ensureLayerOptions
 	_handleOptionsObject(object) {
 		if (object.paint || object.layout)
 			Object.assign(this.options, object)
@@ -52,6 +52,7 @@ export class CompoundItem extends EventEmitter {
 	_parseOptionsObject(object) {
 		let Class = this.constructor
 		for (let [prop, value] of Object.entries(object)) {
+			if (value === undefined) continue
 			if (Class.paint.includes(prop)) {
 				this.options.paint[prop] = value
 			} else if (Class.layout.includes(prop)) {
