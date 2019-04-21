@@ -14,51 +14,58 @@ export class CompoundItem extends EventEmitter {
 
 	constructor(args) {
 		super()
-		/*
-		var firstArg = args[0]
-		if (typeof firstArg === 'string' || typeof firstArg === 'number')
-			this.id = args.shift().toString()
-		else if (firstArg === undefined)
-			args.shift()
-		if (!this.id)
-		*/
-			this.id = createRandomId()
 
-		var data
+		this.id = createRandomId()
+
 		if (isSource(args[0]))
 			this.source = args.shift()
 		if (isGeoJson(args[0]))
-			data = args.shift()
+			this._createSourceOptions(args.shift())
 		else if (Array.isArray(args[0]))
-			data = this._wrapInGeoJson(args.shift())
+			this._createSourceOptions(this._wrapInGeoJson(args.shift()))
 		else
-			data = this._createDummy()
+			this._createSourceOptions(this._createDummy())
 
-		if (typeof args[0] === 'object')
-			this._parseOptionsObject(args.shift())
-		else if (typeof args[args.length - 1] === 'object')
-			this._parseOptionsObject(args.pop())
-		else
-			this.options = {}
-
+		this.options = {paint: {}, layout: {}}
+		if (typeof args[args.length - 1] === 'object')
+			this._handleOptionsObject(args.pop())
 		if (this._createOptionsFromArgs && args.length > 0)
-			this.options = Object.assign({}, this._createOptionsFromArgs(...args), this.options)
-
-		//this.sourceOptions = {data, type: 'geojson', lineMetrics: true}
-		if (!this.source)
-			this.sourceOptions = {data, type: 'geojson'}
+			this._handleOptionsObject(this._createOptionsFromArgs(...args))
 
 		this.onPointDragStart = this.onPointDragStart.bind(this)
 		this.onPointDragMove = this.onPointDragMove.bind(this)
 		this.onPointDragEnd = this.onPointDragEnd.bind(this)
 	}
 
+	_createSourceOptions(data) {
+		this.sourceOptions = {data, type: 'geojson'}
+	}
+
 	// TODO: detect paint/layout with the new static arrays
-	_parseOptionsObject(object) {
+	_handleOptionsObject(object) {
 		if (object.paint || object.layout)
-			this.options = object
+			Object.assign(this.options, object)
 		else
-			this.options = {paint: object}
+			this._parseOptionsObject(object)
+	}
+
+	_parseOptionsObject(object) {
+		let Class = this.constructor
+		for (let [prop, value] of Object.entries(object)) {
+			if (Class.paint.includes(prop)) {
+				this.options.paint[prop] = value
+			} else if (Class.layout.includes(prop)) {
+				this.options.layout[prop] = value
+			} else if (Class.paintKeys.includes(prop)) {
+				let index = Class.paintKeys.indexOf(prop)
+				prop = Class.paint[index]
+				this.options.paint[prop] = value
+			} else if (Class.layoutKeys.includes(prop)) {
+				let index = Class.layoutKeys.indexOf(prop)
+				prop = Class.layout[index]
+				this.options.layout[prop] = value
+			}
+		}
 	}
 
 	// NOTE: this is not part of constructor, because we're tapping into instance
@@ -92,9 +99,6 @@ export class CompoundItem extends EventEmitter {
 				this.layerOptions.paint[prop] = value
 			}
 		}
-
-		//console.log('layerOptions.layout', this.layerOptions.layout)
-		//console.log('layerOptions.paint', this.layerOptions.paint)
 
 		if (this._processOptions)
 			this._processOptions()

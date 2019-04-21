@@ -79,22 +79,28 @@ export function createGetters(Class) {
 	//var descriptors = Object.getOwnPropertyDescriptors(Class.prototype)
 	var descriptors = {}
 	if (Class.paint) {
-		for (let prop of Class.paint) {
-			let key = prop.split('-').pop()
+		Class.paintKeys = Class.paint.map(foobar)
+		Class.paint.forEach((prop, index) => {
+			let key = Class.paintKeys[index]
 			descriptors[key] = {
 				get() {return this.layer.getPaintProperty(prop)},
 				set(value) {this.map.setPaintProperty(this.id, prop, value)}
 			}
-		}
+		})
 	}
 	if (Class.layout) {
-		for (let prop of Class.layout) {
-			let key = prop.split('-').pop()
+		Class.layoutKeys = Class.layout.map(foobar)
+		Class.layout.forEach((prop, index) => {
+			let key = Class.layoutKeys[index]
 			descriptors[key] = {
 				get() {return this.layer.getLayoutProperty(prop)},
 				set(value) {this.map.setLayoutProperty(this.id, prop, value)}
 			}
-		}
+		})
 	}
 	Object.defineProperties(Class.prototype, descriptors)
+}
+
+function foobar(prop) {
+	return prop.split('-').pop()
 }

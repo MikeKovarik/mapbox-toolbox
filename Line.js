@@ -20,7 +20,6 @@ export class Line extends CompoundItem {
 
 	static paint = [
 		'line-width',
-		'line-width',
 		'line-color',
 		'line-opacity',
 	]
@@ -43,12 +42,11 @@ export class Line extends CompoundItem {
 		return {type: 'FeatureCollection', features: []}
 	}
 
-	_createOptionsFromArgs(color, size, style) {
-		return {color, size, style}
+	_createOptionsFromArgs(color, width, style) {
+		return {color, width, style}
 	}
 
 	_processOptions() {
-		console.log('process options', this.options)
 		if (this.options.style) {
 			this.layerOptions.paint['line-dasharray'] = getStyle(this.options.style)
 		} else {
@@ -59,14 +57,7 @@ export class Line extends CompoundItem {
 	get length() {
 		return turf.length(this.data)
 	}
-/*
-	get width() {
-		return this.layer.getPaintProperty('line-width')
-	}
-	set width(value) {
-		this.map.setPaintProperty(this.id, 'line-width', value)
-	}
-*/
+
 	get gradient() {
 		return this.layer.getPaintProperty('line-gradient')
 	}

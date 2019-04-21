@@ -50,7 +50,7 @@ export class Point extends CompoundItem {
 					options.color = arg
 					break
 				case 'number':
-					options.size = arg
+					options.radius = arg
 					break
 			}
 		}
