@@ -14,11 +14,9 @@ createGetters(Polygon)
 createGetters(Label)
 
 function createGetters(Class) {
-	var setters = Class.setters || []
-	var getters = Class.getters || []
+	//var descriptors = Object.getOwnPropertyDescriptors(Class.prototype)
 	var descriptors = {}
 	if (Class.paint) {
-		console.log('Class.paint', Class.paint)
 		for (let prop of Class.paint) {
 			let key = prop.split('-').pop()
 			descriptors[key] = {

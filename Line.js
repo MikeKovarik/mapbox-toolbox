@@ -58,14 +58,14 @@ export class Line extends CompoundItem {
 	get length() {
 		return turf.length(this.data)
 	}
-
+/*
 	get width() {
 		return this.layer.getPaintProperty('line-width')
 	}
 	set width(value) {
 		this.map.setPaintProperty(this.id, 'line-width', value)
 	}
-
+*/
 	get gradient() {
 		return this.layer.getPaintProperty('line-gradient')
 	}

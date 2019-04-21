@@ -53,6 +53,7 @@ export class CompoundItem extends EventEmitter {
 		this.onPointDragEnd = this.onPointDragEnd.bind(this)
 	}
 
+	// TODO: detect paint/layout with the new static arrays
 	_parseOptionsObject(object) {
 		if (object.paint || object.layout)
 			this.options = object
