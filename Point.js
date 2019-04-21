@@ -1,5 +1,5 @@
 import {CompoundItem} from './CompoundItem.js'
-import {isGeoJson, getColor, getStyle} from './util.js'
+import {isGeoJson, createGetters} from './util.js'
 
 /*
 export const POINT_PAINT = {
@@ -64,3 +64,5 @@ export class Point extends CompoundItem {
 	}
 
 }
+
+createGetters(Point)

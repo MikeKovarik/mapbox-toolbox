@@ -5,42 +5,12 @@ import {Label} from './Label.js'
 //import {Marker} from './Marker.js'
 import {extend} from './util.js'
 import {isCoord, isCoords, isBbox, isGeoJson, createRandomId} from './util.js'
-import {getColor} from './util.js'
 
-
-createGetters(Point)
-createGetters(Line)
-createGetters(Polygon)
-createGetters(Label)
-
-function createGetters(Class) {
-	//var descriptors = Object.getOwnPropertyDescriptors(Class.prototype)
-	var descriptors = {}
-	if (Class.paint) {
-		for (let prop of Class.paint) {
-			let key = prop.split('-').pop()
-			descriptors[key] = {
-				get() {return this.layer.getPaintProperty(prop)},
-				set(value) {this.map.setPaintProperty(this.id, prop, value)}
-			}
-		}
-	}
-	if (Class.layout) {
-		for (let prop of Class.layout) {
-			let key = prop.split('-').pop()
-			descriptors[key] = {
-				get() {return this.layer.getLayoutProperty(prop)},
-				set(value) {this.map.setLayoutProperty(this.id, prop, value)}
-			}
-		}
-	}
-	Object.defineProperties(Class.prototype, descriptors)
-}
 
 function getNewNode(size, color) {
 	var node = document.createElement('div')
 	Object.assign(node.style, {
-		backgroundColor: getColor(color),
+		backgroundColor: color,
 		width:  `${size}px`,
 		height: `${size}px`,
 		borderRadius: '100%',

@@ -1,5 +1,5 @@
 import {CompoundItem} from './CompoundItem.js'
-import {isGeoJson, getColor, getStyle} from './util.js'
+import {isGeoJson, createGetters, getStyle} from './util.js'
 
 
 const LAYOUT = {
@@ -48,6 +48,7 @@ export class Line extends CompoundItem {
 	}
 
 	_processOptions() {
+		console.log('process options', this.options)
 		if (this.options.style) {
 			this.layerOptions.paint['line-dasharray'] = getStyle(this.options.style)
 		} else {
@@ -120,3 +121,5 @@ export class Line extends CompoundItem {
 	}
 
 }
+
+createGetters(Line)

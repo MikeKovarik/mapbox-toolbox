@@ -49,27 +49,11 @@ export function createRandomId() {
 }
 
 
-export var colors = {
-	default: document.querySelector('meta[name="theme-color"]').content || '#16a6df',
-	blue: '#16a6df',
-	pink: '#df16a6',
-	green: '#7dc02f',
-	red: 'rgb(174, 0, 32)'
-}
-
-export function mapColor(nameOrHex, fallback = nameOrHex) {
-	return colors[nameOrHex] || fallback
-}
-
 // paint['line-dasharray'] = [2, 1]
 export const SOLID = undefined
 //export const DOTTED = [1, 1]
 export const DOTTED = [0.8, 0.8]
 export const DASHED = [2, 1]
-
-export function getColor(arg) {
-	return mapColor(arg) || colors.default
-}
 
 export function getStyle(arg) {
 	switch (arg) {
@@ -88,4 +72,29 @@ export function extend(Target, Source) {
 	delete protoDesc.constructor
 	Object.defineProperties(Target, staticDesc)
 	Object.defineProperties(Target.prototype, protoDesc)
+}
+
+
+export function createGetters(Class) {
+	//var descriptors = Object.getOwnPropertyDescriptors(Class.prototype)
+	var descriptors = {}
+	if (Class.paint) {
+		for (let prop of Class.paint) {
+			let key = prop.split('-').pop()
+			descriptors[key] = {
+				get() {return this.layer.getPaintProperty(prop)},
+				set(value) {this.map.setPaintProperty(this.id, prop, value)}
+			}
+		}
+	}
+	if (Class.layout) {
+		for (let prop of Class.layout) {
+			let key = prop.split('-').pop()
+			descriptors[key] = {
+				get() {return this.layer.getLayoutProperty(prop)},
+				set(value) {this.map.setLayoutProperty(this.id, prop, value)}
+			}
+		}
+	}
+	Object.defineProperties(Class.prototype, descriptors)
 }

@@ -1,5 +1,5 @@
 import {CompoundItem} from './CompoundItem.js'
-import {isGeoJson, isCoord, isCoords, getColor, getStyle} from './util.js'
+import {isGeoJson, createGetters, isCoord, isCoords} from './util.js'
 
 
 export class Label extends CompoundItem {
@@ -56,3 +56,5 @@ export class Label extends CompoundItem {
 	}
 
 }
+
+createGetters(Label)

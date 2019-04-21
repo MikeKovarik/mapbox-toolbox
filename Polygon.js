@@ -1,5 +1,5 @@
 import {CompoundItem} from './CompoundItem.js'
-import {isGeoJson} from './util.js'
+import {isGeoJson, createGetters} from './util.js'
 
 
 export class Polygon extends CompoundItem {
@@ -43,15 +43,6 @@ export class Polygon extends CompoundItem {
 		this.render()
 	}
 
-
-/*
-	foobar() {
-		this.map.addSource(this.id, this.sourceOptions)
-
-		this.map.addLayer(this.layerOptions)
-
-		var polygonLine = turf.polygonToLine(polygon)
-		this.renderLine(polygonLine, color, 1)
-	}
-*/
 }
+
+createGetters(Polygon)
