@@ -79,7 +79,7 @@ export function createGetters(Class) {
 	//var descriptors = Object.getOwnPropertyDescriptors(Class.prototype)
 	var descriptors = {}
 	if (Class.paint) {
-		Class.paintKeys = Class.paint.map(foobar)
+		Class.paintKeys = Class.paint.map(sliceFirstSection)
 		Class.paint.forEach((prop, index) => {
 			let key = Class.paintKeys[index]
 			descriptors[key] = {
@@ -89,7 +89,7 @@ export function createGetters(Class) {
 		})
 	}
 	if (Class.layout) {
-		Class.layoutKeys = Class.layout.map(foobar)
+		Class.layoutKeys = Class.layout.map(sliceFirstSection)
 		Class.layout.forEach((prop, index) => {
 			let key = Class.layoutKeys[index]
 			descriptors[key] = {
@@ -101,6 +101,6 @@ export function createGetters(Class) {
 	Object.defineProperties(Class.prototype, descriptors)
 }
 
-function foobar(prop) {
-	return prop.split('-').pop()
+function sliceFirstSection(prop) {
+	return prop.slice(prop.indexOf('-') + 1)
 }

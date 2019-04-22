@@ -51,20 +51,28 @@ export class CompoundItem extends EventEmitter {
 
 	_parseOptionsObject(object) {
 		let Class = this.constructor
+		let {paintKeys, layoutKeys} = Class
+		let paintProps = Class.paint
+		let layoutProps = Class.layout
 		for (let [prop, value] of Object.entries(object)) {
 			if (value === undefined) continue
-			if (Class.paint.includes(prop)) {
-				this.options.paint[prop] = value
-			} else if (Class.layout.includes(prop)) {
-				this.options.layout[prop] = value
-			} else if (Class.paintKeys.includes(prop)) {
-				let index = Class.paintKeys.indexOf(prop)
-				prop = Class.paint[index]
-				this.options.paint[prop] = value
-			} else if (Class.layoutKeys.includes(prop)) {
-				let index = Class.layoutKeys.indexOf(prop)
-				prop = Class.layout[index]
-				this.options.layout[prop] = value
+			if (paintProps) {
+				if (paintProps.includes(prop)) {
+					this.options.paint[prop] = value
+				} else if (paintKeys.includes(prop)) {
+					let index = paintKeys.indexOf(prop)
+					prop = paintProps[index]
+					this.options.paint[prop] = value
+				}
+			}
+			if (layoutProps) {
+				if (layoutProps.includes(prop)) {
+					this.options.layout[prop] = value
+				} else if (layoutKeys.includes(prop)) {
+					let index = layoutKeys.indexOf(prop)
+					prop = layoutProps[index]
+					this.options.layout[prop] = value
+				}
 			}
 		}
 	}

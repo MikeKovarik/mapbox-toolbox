@@ -7,15 +7,23 @@ export class Label extends CompoundItem {
 	static type = 'symbol'
 
 	static layout = [
+		'symbol-placement',
+		'text-image',
 		'text-field',
+		'text-font',
 		'text-size',
+		'text-justify',
+		'text-anchor',
+		'text-offset',
 	]
 
 	static paint = [
 		'text-color',
 		'text-opacity',
+		'text-halo-color',
+		'text-halo-width',
 	]
-
+/*
 	constructor(...args) {
 		super(...args)
 		var data = this.sourceOptions.data
@@ -25,7 +33,7 @@ export class Label extends CompoundItem {
 			this.sourceOptions.data = turf.along(line, length / 2)
 		}
 	}
-
+*/
 	_wrapInGeoJson(arg) {
 		if (isGeoJson(arg)) return arg
 		if (isCoord(arg)) return turf.point(arg)
@@ -51,8 +59,8 @@ export class Label extends CompoundItem {
 
 	paint = {
 		'text-color': '#000',
-		'text-halo-color': '#EEE',
-		'text-halo-width': 5
+		//'text-halo-color': '#EEE',
+		//'text-halo-width': 5
 	}
 
 }

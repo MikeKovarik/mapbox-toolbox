@@ -20,7 +20,6 @@ export class Line extends CompoundItem {
 
 	static paint = [
 		'line-width',
-		'line-width',
 		'line-color',
 		'line-opacity',
 	]
@@ -43,8 +42,8 @@ export class Line extends CompoundItem {
 		return {type: 'FeatureCollection', features: []}
 	}
 
-	_createOptionsFromArgs(color, size, style) {
-		return {color, size, style}
+	_createOptionsFromArgs(color, width, style) {
+		return {color, width, style}
 	}
 
 	_processOptions() {

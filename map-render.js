@@ -67,28 +67,6 @@ class MapExtension {
 		return (new Polygon(args)).addTo(this)
 	}
 
-	renderGeoJson(data) {
-		var id = createRandomId()
-
-		this.addSource(id, {
-			type: 'geojson',
-			data
-		})
-
-		this.addLayer({
-			id,
-			source: id,
-			type: 'line',
-			/*
-			paint: {
-				'line-color': this.accent,
-				'line-width': 3,
-			},
-			//layout: LINE_LAYOUT
-			*/
-		})
-	}
-
 	renderMarker(...args) {
 		var node = args[0] instanceof HTMLElement ? args.shift() : undefined
 		var [coords, color, size] = args

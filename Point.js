@@ -28,6 +28,9 @@ export class Point extends CompoundItem {
 		'circle-radius',
 		'circle-color',
 		'circle-opacity',
+		'circle-stroke-width',
+		'circle-stroke-color',
+		'circle-stroke-opacity',
 	]
 
 	paint = {
