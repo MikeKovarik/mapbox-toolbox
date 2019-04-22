@@ -224,21 +224,13 @@ export class CompoundItem extends EventEmitter {
 	}
 
 	get empty() {
-		return this.data.type === 'FeatureCollection'
-	}
-
-	get name() {
-		return this.data.properties.name
-	}
-	set name(newData) {
-		this.data.properties.name = newData
-	}
-
-	get description() {
-		return this.data.properties.description
-	}
-	set description(newData) {
-		this.data.properties.description = newData
+		let data = this.data
+		if (!data) return true
+		if (data.geometry && data.geometry.coordinates)
+			return data.geometry.coordinates.length === 0
+		if (data.features)
+			return data.features.length === 0
+		return false
 	}
 
 	// VISIBILITY

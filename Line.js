@@ -20,7 +20,6 @@ export class Line extends CompoundItem {
 
 	static paint = [
 		'line-width',
-		'line-width',
 		'line-color',
 		'line-opacity',
 	]
