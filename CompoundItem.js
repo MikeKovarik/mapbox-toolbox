@@ -22,7 +22,7 @@ export class CompoundItem extends EventEmitter {
 		if (isGeoJson(args[0]))
 			this._createSourceOptions(args.shift())
 		else if (Array.isArray(args[0]))
-			this._createSourceOptions(this._wrapInGeoJson(args.shift()))
+			this._createSourceOptions(this._ensureGeoJson(args.shift()))
 		else
 			this._createSourceOptions(this._createDummy())
 
@@ -193,6 +193,11 @@ export class CompoundItem extends EventEmitter {
 
 	// GEOJSON sugar
 
+	_ensureGeoJson(data) {
+		if (isGeoJson(data)) return data
+		return this._wrapInGeoJson(data)
+	}
+
 	get data() {
 		return this.source._data
 		//return this.data.source.serialize()
@@ -202,7 +207,7 @@ export class CompoundItem extends EventEmitter {
 		if (!data)
 			data = this._createDummy()
 		else
-			data = this._wrapInGeoJson(data)
+			data = this._ensureGeoJson(data)
 		this.source.setData(data)
 	}
 
@@ -216,7 +221,7 @@ export class CompoundItem extends EventEmitter {
 		if (!coords) {
 			this.data = undefined
 		} else if (this.empty) {
-			this.data = turf.lineString(coords)
+			this.data = this._wrapInGeoJson(coords)
 		} else {
 			this.data.geometry.coordinates = coords
 			this.render()

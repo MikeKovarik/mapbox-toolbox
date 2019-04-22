@@ -34,8 +34,8 @@ export class Line extends CompoundItem {
 		'line-width': VARIABLE_WIDTH,
 	}
 
-	_wrapInGeoJson(arg) {
-		return isGeoJson(arg) ? arg : turf.lineString(arg)
+	_wrapInGeoJson(coords) {
+		return turf.lineString(coords)
 	}
 
 	_createDummy() {

@@ -35,7 +35,6 @@ export class Label extends CompoundItem {
 	}
 */
 	_wrapInGeoJson(arg) {
-		if (isGeoJson(arg)) return arg
 		if (isCoord(arg)) return turf.point(arg)
 		if (isCoords(arg)) {
 			var line = turf.lineString(arg)

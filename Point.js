@@ -37,8 +37,8 @@ export class Point extends CompoundItem {
 		'circle-radius': 8,
 	}
 
-	_wrapInGeoJson(arg) {
-		return isGeoJson(arg) ? arg : turf.point(arg)
+	_wrapInGeoJson(coords) {
+		return turf.point(coords)
 	}
 
 	_createDummy() {

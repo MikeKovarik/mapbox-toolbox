@@ -16,14 +16,13 @@ export class Polygon extends CompoundItem {
 	}
 
 	_wrapInGeoJson(arg) {
-		if (isGeoJson(arg)) {
-			return arg
-		} else if (Array.isArray(arg)) {
+		if (Array.isArray(arg)) {
 			if (arg.length === 4 && typeof arg[0] === 'number')
 				return turf.bboxPolygon(arg)
 			else
 				return turf.polygon(arg)
 		}
+		console.warn('unknown polygon data')
 	}
 
 	_createDummy() {
