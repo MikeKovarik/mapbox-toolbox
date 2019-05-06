@@ -37,6 +37,13 @@ export class Point extends CompoundItem {
 		'circle-radius': 8,
 	}
 
+	get size() {
+		return this['circle-radius']
+	}
+	set size(value) {
+		this['circle-radius'] = value
+	}
+
 	_wrapInGeoJson(coords) {
 		return turf.point(coords)
 	}
