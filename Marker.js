@@ -5,11 +5,20 @@ export var Marker = mapboxgl.Marker
 
 var _on = Marker.prototype.on
 var _emit = Marker.prototype.emit
+var _addTo = Marker.prototype.addTo
 
 class MarkerExtension {
 
-	get node() {
+	// _node is custom, _element is Mapbox thing
+	get container() {
 		return this._element
+	}
+	get node() {
+		return this._node || this._element
+	}
+	// setter is good for containarized nodes (images) with custom transform behavior
+	set node(node) {
+		this._node = node
 	}
 
 	get color() {
@@ -28,10 +37,23 @@ class MarkerExtension {
 	}
 
 	get scale() {
-		return this.node.style.transform = Number(scale.match(/[\d\.]+/g))
+		let match = this.node.style.transform.match(/scale\((.*?)\)/)
+		if (match) return Number(match[1])
+		return 1
 	}
 	set scale(scale) {
-		this.node.style.transform = `scale(${scale})`
+		let {transform} = this.node.style
+		if (transform.includes('scale'))
+			this.node.style.transform = transform.replace(/scale\(.*?\)/, `scale(${scale})`)
+		else
+			this.node.style.transform += ` scale(${scale})`
+	}
+
+	get zIndex() {
+		return this.container.style.zIndex
+	}
+	set zIndex(zIndex) {
+		this.container.style.zIndex = zIndex
 	}
 
 	get data() {

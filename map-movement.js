@@ -15,7 +15,8 @@ class MapExtension {
 	//get lat() {}
 
 	get center() {return this.getCenter().toArray()}
-	set center(center) {this.flyTo({center})}
+	set center(center) {this.animate({center})}
+	//set center(center) {this.flyTo({center})}
 
 	// basics
 
@@ -36,7 +37,8 @@ class MapExtension {
 		this._animationQueue = this._animationQueue || {}
 		this._animationQueue[key] = value
 		this._animationTimeout = setTimeout(() => {
-			this.easeTo(this._animationQueue)
+			this.animate(this._animationQueue)
+			//this.easeTo(this._animationQueue)
 			this._animationQueue = undefined
 		})
 	}
@@ -173,6 +175,8 @@ class MapExtension {
 		}
 	}
 
+	// multipurpose, accepts anything:
+	// bbox, (center, zoom), bearing, pitch, duration
 	animate(...args) {
 		var mapOptions = this._transformArgsToMapOptions(args)
 		if (mapOptions.duration === undefined) {

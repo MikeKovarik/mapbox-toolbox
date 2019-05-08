@@ -86,8 +86,8 @@ class MapExtension {
 		return marker
 	}
 
-	renderImage(url, coords, size, color) {
-		var node = getNewNode(size, color)
+	renderImage(url, coords, size) {
+		var node = getNewNode(size)
 		Object.assign(node.style, {
 			backgroundPosition: 'center',
 			backgroundSize: 'cover',
@@ -95,9 +95,12 @@ class MapExtension {
 		})
 		var container = document.createElement('div')
 		container.appendChild(node)
-		return new mapboxgl.Marker(container)
-			.setLngLat(turf.getCoord(coords))
-			.addTo(this)
+		var marker = new mapboxgl.Marker(container)
+		marker.setLngLat(turf.getCoord(coords))
+		marker.addTo(this)
+		// overwriting node
+		marker.node = node
+		return marker
 	}
 
 	/*
