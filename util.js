@@ -5,6 +5,13 @@ Evented.prototype.removeAllListeners = function() {
 		for (let listener of listeners)
 			this.off(name, listener)
 }
+Evented.prototype._once = Evented.prototype.once
+Evented.prototype.once = function(name, listener) {
+	if (listener === undefined)
+		return new Promise(resolve => this._once(name, resolve))
+	else
+		this._once(name, listener)
+}
 export var EventEmitter = Evented
 
 export var featuresMap = new WeakMap
@@ -51,7 +58,6 @@ export function createRandomId() {
 
 // paint['line-dasharray'] = [2, 1]
 export const SOLID = undefined
-//export const DOTTED = [1, 1]
 export const DOTTED = [0.8, 0.8]
 export const DASHED = [2, 1]
 

@@ -14,6 +14,43 @@ class MapExtension {
 	//get lng() {}
 	//get lat() {}
 
+	get center() {return this.getCenter().toArray()}
+	set center(center) {this.flyTo({center})}
+
+	// basics
+
+	get zoom() {return this.getZoom()}
+	set zoom(zoom) {this._queueAnimation('zoom', zoom)}
+	//set zoom(zoom) {this.easeTo({zoom})}
+
+	get bearing() {return this.getBearing()}
+	set bearing(bearing) {this._queueAnimation('bearing', bearing)}
+	//set bearing(bearing) {this.easeTo({bearing})}
+
+	get pitch() {return this.getPitch()}
+	set pitch(pitch) {this._queueAnimation('pitch', pitch)}
+	//set pitch(pitch) {this.easeTo({pitch})}
+
+	_queueAnimation(key, value) {
+		clearTimeout(this._animationTimeout)
+		this._animationQueue = this._animationQueue || {}
+		this._animationQueue[key] = value
+		this._animationTimeout = setTimeout(() => {
+			this.easeTo(this._animationQueue)
+			this._animationQueue = undefined
+		})
+	}
+
+	// aliases
+
+	get rotation() {return this.bearing}
+	set rotation(bearing) {this.bearing = bearing}
+
+	get tilt() {return this.pitch}
+	set tilt(pitch) {this.pitch = pitch}
+
+	// canvas width
+
 	get width()  {return this.transform.width}
 	get height() {return this.transform.height}
 
@@ -106,7 +143,6 @@ class MapExtension {
 			return this.fitBounds(coords)
 		}
 	}
-
 
 	// TODO: polish these custom methods
 

@@ -17,8 +17,9 @@
     "turf": "^7.0.0"
   },
   "devDependencies": {
-    "rollup": "^0.59.4",
+    "rollup": "^1.11.3",
     "rollup-plugin-notify": "^1.0.1",
-    "rollup-plugin-uglify-es": "0.0.1"
+    "acorn-static-class-features": "0.2.0",
+    "acorn-class-fields": "0.3.1"
   }
 }

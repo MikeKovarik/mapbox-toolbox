@@ -74,9 +74,16 @@ class MapExtension {
 			if (size === undefined) size = 10
 			node = getNewNode(size, color)
 		}
-		return new mapboxgl.Marker(node)
-			.setLngLat(turf.getCoord(coords))
-			.addTo(this)
+		let marker = new mapboxgl.Marker(node)
+		marker.map = this
+		if (coords) {
+			marker.coords = coords
+			marker.addTo(this)
+			marker.added = true
+		} else {
+			marker.added = false
+		}
+		return marker
 	}
 
 	renderImage(url, coords, size, color) {

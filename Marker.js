@@ -9,7 +9,7 @@ var _emit = Marker.prototype.emit
 class MarkerExtension {
 
 	get node() {
-		return this._node || (this._node = this.getElement().firstElementChild)
+		return this._element
 	}
 
 	get color() {
@@ -45,8 +45,16 @@ class MarkerExtension {
 	get coords() {
 		return this.getLngLat().toArray()
 	}
-	set coords(newData) {
-		this.setLngLat(turf.getCoord(newData))
+	set coords(arg) {
+		if (!arg) return
+		if (arg.lat && (arg.lon || arg.lng))
+			this.setLngLat(arg)
+		else
+			this.setLngLat(turf.getCoord(arg))
+		if (!this.added) {
+			this.addTo(this.map)
+			this.added = true
+		}
 	}
 
 	get draggable() {
@@ -59,7 +67,7 @@ class MarkerExtension {
 	// VISIBILITY
 
 	get visible() {
-		return this.node.style.display === 'none'
+		return this.node.style.display !== 'none'
 	}
 	set visible(value) {
 		this.node.style.display = value ? '' : 'none'
@@ -106,4 +114,4 @@ class MarkerExtension {
 Marker.prototype._on = Marker.prototype.on
 Marker.prototype._once = Marker.prototype.once
 Marker.prototype._emit = Marker.prototype.emit
-extend(Marker, MarkerExtension)
+extend(mapboxgl.Marker, MarkerExtension)

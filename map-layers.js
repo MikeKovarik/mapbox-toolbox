@@ -1,12 +1,17 @@
 import {extend, createRandomId} from './util.js'
 
 
-var {Map} = mapboxgl
-
 class MapExtension {
+
+	// creates empty geojson source. empty feature collection by default. should be replaced by user
+	createSource() {
+		return this.addGeoJson()
+	}
 
 	addGeoJson(data) {
 		var id = createRandomId()
+		if (data === undefined)
+			data = {type: 'FeatureCollection', features: []}
 		this.addSource(id, {type: 'geojson', data})
 		return this.getSource(id)
 	}
@@ -72,24 +77,6 @@ class MapExtension {
 	get cursor() {return this.canvas.style.cursor}
 	set cursor(cursor) {this.canvas.style.cursor = cursor}
 
-	get zoom() {return this.getZoom()}
-	set zoom(zoom) {this.easeTo({zoom})}
-
-	get bearing() {return this.getBearing()}
-	set bearing(bearing) {this.easeTo({bearing})}
-
-	get pitch() {return this.getPitch()}
-	set pitch(pitch) {this.easeTo({pitch})}
-
-	get rotation() {return this.bearing}
-	set rotation(bearing) {this.bearing = bearing}
-
-	get tilt() {return this.pitch}
-	set tilt(pitch) {this.pitch = pitch}
-
-	get center() {return this.getCenter().toArray()}
-	set center(center) {this.flyTo({center})}
-
 	get bounds() {return this.getBounds().toArray().flat()}
 	set bounds(bounds) {
 		console.warn('not implemented')
@@ -104,4 +91,4 @@ class MapExtension {
 
 }
 
-extend(Map, MapExtension)
+extend(mapboxgl.Map, MapExtension)

@@ -1,6 +1,8 @@
 import {CompoundItem} from './CompoundItem.js'
-import {isGeoJson, createGetters, getStyle} from './util.js'
+import {createGetters, getStyle} from './util.js'
+import {DASHED, DOTTED, SOLID} from './util.js'
 
+// TODO: reimplement dashes/dotted line styles
 
 const LAYOUT = {
 	'line-cap': 'round',
@@ -22,12 +24,12 @@ export class Line extends CompoundItem {
 		'line-width',
 		'line-color',
 		'line-opacity',
+		'line-dasharray',
 	]
 
 	static layout = [
 		'line-cap',
 		'line-join',
-		'line-dasharray'
 	]
 
 	paint = {
@@ -42,8 +44,17 @@ export class Line extends CompoundItem {
 		return {type: 'FeatureCollection', features: []}
 	}
 
-	_createOptionsFromArgs(color, size, style) {
-		return {color, size, style}
+	_createOptionsFromArgs(color, width) {
+		return {color, width}
+	}
+
+	set dashed(bool) {
+		console.log('set dashed', bool)
+		this['line-dasharray'] = bool ? DASHED : SOLID
+	}
+	set dotted(bool) {
+		console.log('set dotted', bool)
+		this['line-dasharray'] = bool ? DOTTED : SOLID
 	}
 
 	_processOptions() {
@@ -55,7 +66,7 @@ export class Line extends CompoundItem {
 	}
 
 	get length() {
-		return turf.length(this.data)
+		return turf && turf.length(this.data)
 	}
 
 	get gradient() {
