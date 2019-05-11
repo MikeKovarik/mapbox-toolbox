@@ -3,11 +3,12 @@ import {extend} from './util.js'
 
 export var Marker = mapboxgl.Marker
 
-var _on = Marker.prototype.on
-var _emit = Marker.prototype.emit
-var _addTo = Marker.prototype.addTo
-
 class MarkerExtension {
+
+	addTo(map) {
+		this.added = true
+		this._addTo(map)
+	}
 
 	// _node is custom, _element is Mapbox thing
 	get container() {
@@ -73,10 +74,7 @@ class MarkerExtension {
 			this.setLngLat(arg)
 		else
 			this.setLngLat(turf.getCoord(arg))
-		if (!this.added) {
-			this.addTo(this.map)
-			this.added = true
-		}
+		if (this.added === undefined) this.addTo(this.map)
 	}
 
 	get draggable() {
@@ -136,4 +134,5 @@ class MarkerExtension {
 Marker.prototype._on = Marker.prototype.on
 Marker.prototype._once = Marker.prototype.once
 Marker.prototype._emit = Marker.prototype.emit
+Marker.prototype._addTo = Marker.prototype.addTo
 extend(mapboxgl.Marker, MarkerExtension)

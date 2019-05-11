@@ -76,13 +76,7 @@ class MapExtension {
 		}
 		let marker = new mapboxgl.Marker(node)
 		marker.map = this
-		if (coords) {
-			marker.coords = coords
-			marker.addTo(this)
-			marker.added = true
-		} else {
-			marker.added = false
-		}
+		if (coords) marker.coords = coords
 		return marker
 	}
 
@@ -96,8 +90,8 @@ class MapExtension {
 		var container = document.createElement('div')
 		container.appendChild(node)
 		var marker = new mapboxgl.Marker(container)
-		marker.setLngLat(turf.getCoord(coords))
-		marker.addTo(this)
+		marker.map = this
+		if (coords) marker.coords = coords
 		// overwriting node
 		marker.node = node
 		return marker

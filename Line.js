@@ -48,15 +48,6 @@ export class Line extends CompoundItem {
 		return {color, width}
 	}
 
-	set dashed(bool) {
-		console.log('set dashed', bool)
-		this['line-dasharray'] = bool ? DASHED : SOLID
-	}
-	set dotted(bool) {
-		console.log('set dotted', bool)
-		this['line-dasharray'] = bool ? DOTTED : SOLID
-	}
-
 	_processOptions() {
 		if (this.options.style) {
 			this.layerOptions.paint['line-dasharray'] = getStyle(this.options.style)
@@ -67,6 +58,15 @@ export class Line extends CompoundItem {
 
 	get length() {
 		return turf && turf.length(this.data)
+	}
+
+	set dashed(bool) {
+		console.log('set dashed', bool)
+		this['line-dasharray'] = bool ? DASHED : SOLID
+	}
+	set dotted(bool) {
+		console.log('set dotted', bool)
+		this['line-dasharray'] = bool ? DOTTED : SOLID
 	}
 
 	get gradient() {

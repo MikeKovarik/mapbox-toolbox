@@ -1,4 +1,4 @@
-import {extend, isGeoJson, isCoord, isBbox} from './util.js'
+import {extend, isGeoJson, isCoord, isCoords, isBbox, coordsToBbox} from './util.js'
 
 
 var {Map} = mapboxgl
@@ -8,6 +8,21 @@ var _panTo = Map.prototype.panTo
 var _fitBounds = Map.prototype.fitBounds
 
 class MapExtension {
+
+	// TODO: move this to separate class? map-core or something
+	get isReady() {
+		return this.style !== undefined
+			&& this.style._loaded
+	}
+
+	get ready() {
+		if (this.isReady) return Promise.resolve()
+		// WARNING: 'style.load' will be removed once 'styledata' is fixed
+		// https://github.com/mapbox/mapbox-gl-js/issues/3970#issuecomment-275722197
+		//map.once('styledata', e => map.isStyleLoaded())
+		return new Promise(resolve => this.once('style.load', resolve))
+	}
+
 
 	// TODO: get/set current center. alternative for get center() {}
 	//get lon() {}
@@ -131,7 +146,6 @@ class MapExtension {
 		return _fitBounds.call(this, bounds, options, e)
 	}
 
-
 	// TODO: rework to use custom methods instead of modifying original API
 	animateTo(coords) {
 		if (isGeoJson(coords)) {
@@ -155,12 +169,31 @@ class MapExtension {
 			mapOptions = {}
 		}
 		if (arg) {
-			if (isBbox(arg))
+			if (isBbox(arg)) {
 				mapOptions.bounds = arg
-			else if (isCoord(arg))
+			} else if (isCoord(arg)) {
 				mapOptions.center = arg
+			} else if (isCoords(arg)) {
+				mapOptions.bounds = coordsToBbox(arg)
+			} else if (isGeoJson(coords)) {
+				// TODO: handle feature collection
+				if (coords.geometry.type === 'Point')
+					mapOptions.center = arg.geometry.coordinates
+				else
+					mapOptions.bounds = coordsToBbox(arg.geometry.coordinates)
+			}
 		}
 		return mapOptions
+	}
+
+	// TODO: one function to rule them all
+	fit(...args) {
+		if (this.isReady) {
+			return this.animate(...args)
+		} else {
+			this.jump(...args)
+			await this.ready
+		}
 	}
 
 	jump(...args) {

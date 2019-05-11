@@ -243,7 +243,7 @@ export class CompoundItem extends EventEmitter {
 	// map.isHidden()
 
 	get visible() {
-		return this.layer.visibility === 'visible'
+		return this.layer.visibility !== 'none'
 		return this.layer.getLayoutProperty('visibility') === 'visible'
 	}
 	set visible(value) {

@@ -39,6 +39,13 @@ export function isBbox(arg) {
 		&& (isFlatBbox(arg) || isNestedBbox(arg))
 }
 
+export function coordsToBbox(coords) {
+	let bounds = new mapboxgl.LngLatBounds(coords[0], coords[0])
+	for (let coord of coords)
+		bounds.extend(coord)
+	return bounds
+}
+
 function isFlatBbox(arr) {
 	return arr.length === 4
 		&& typeof arr[0] === 'number'
