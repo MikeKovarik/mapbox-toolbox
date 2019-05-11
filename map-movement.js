@@ -160,7 +160,9 @@ class MapExtension {
 		}
 	}
 
-	// TODO: polish these custom methods
+	//////////////////////////////////////////////////////////////////////
+	// CLEAN CUSTOM API //////////////////////////////////////////////////
+	//////////////////////////////////////////////////////////////////////
 
 	_transformArgsToMapOptions(args) {
 		var [mapOptions, arg] = args.reverse()
@@ -175,25 +177,17 @@ class MapExtension {
 				mapOptions.center = arg
 			} else if (isCoords(arg)) {
 				mapOptions.bounds = coordsToBbox(arg)
-			} else if (isGeoJson(coords)) {
+			} else if (isGeoJson(arg)) {
 				// TODO: handle feature collection
-				if (coords.geometry.type === 'Point')
+				if (arg.geometry.type === 'Point')
 					mapOptions.center = arg.geometry.coordinates
+				if (arg.type === 'FeatureCollection')
+					mapOptions.bounds = turf.bbox(arg) // warning: turf
 				else
 					mapOptions.bounds = coordsToBbox(arg.geometry.coordinates)
 			}
 		}
 		return mapOptions
-	}
-
-	// TODO: one function to rule them all
-	fit(...args) {
-		if (this.isReady) {
-			return this.animate(...args)
-		} else {
-			this.jump(...args)
-			await this.ready
-		}
 	}
 
 	jump(...args) {
@@ -225,6 +219,16 @@ class MapExtension {
 			this.easeTo(mapOptions)
 		}
 		return Promise.timeout(mapOptions.duration)
+	}
+
+	// TODO: one function to rule them all
+	fit(...args) {
+		if (this.isReady) {
+			return this.animate(...args)
+		} else {
+			this.jump(...args)
+			return this.ready
+		}
 	}
 
 }
