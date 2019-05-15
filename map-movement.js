@@ -166,7 +166,7 @@ class MapExtension {
 
 	_transformArgsToMapOptions(args) {
 		var [mapOptions, arg] = args.reverse()
-		if (Array.isArray(mapOptions)) {
+		if (Array.isArray(mapOptions) || isGeoJson(mapOptions)) {
 			arg = mapOptions
 			mapOptions = {}
 		}
@@ -181,10 +181,10 @@ class MapExtension {
 				// TODO: handle feature collection
 				if (arg.geometry.type === 'Point')
 					mapOptions.center = arg.geometry.coordinates
-				if (arg.type === 'FeatureCollection')
-					mapOptions.bounds = turf.bbox(arg) // warning: turf
-				else
+				else if (arg.geometry.coordinates)
 					mapOptions.bounds = coordsToBbox(arg.geometry.coordinates)
+				else
+					mapOptions.bounds = turf.bbox(arg) // warning: turf
 			}
 		}
 		return mapOptions

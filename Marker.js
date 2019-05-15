@@ -104,6 +104,10 @@ class MarkerExtension {
 		this.visible = false
 	}
 
+	toggle() {
+		this.visible = !this.visible
+	}
+
 	// EVENTS ////////////////////////////////////////
 
 	static nodeEvents = ['click', 'pointerdown', 'pointerup', 'pointerover', 'pointerout']

@@ -43,6 +43,7 @@ class MapExtension {
 		var options = {
 			layers: this.layers.map(l => l.id)
 		}
+		console.log('options', options)
 		return this.queryRenderedFeatures(options)
 			//.filter(fd => fd.source !== 'composite')
 			.filter(fd => {
@@ -56,6 +57,8 @@ class MapExtension {
 			.map(fd => {
 				var {id} = fd.properties
 				var source = map.getSource(fd.source)
+				console.log('id', id)
+				console.log('source._data', source._data)
 				return source._data.features.find(f => f.properties.id === id)
 			})
 	}

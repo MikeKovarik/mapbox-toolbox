@@ -14,10 +14,12 @@ function getNewNode(size, color) {
 		width:  `${size}px`,
 		height: `${size}px`,
 		borderRadius: '100%',
+		willChange: 'transform, background, width, height',
+		// TODO: rework marker to use container as well.
+		// transitions break since the marker itself is transformed (translate) by mapbox
 		transitionDuration: '180ms',
 		transitionTimingFunction: 'cubic-bezier(0.4, 0, 0.2, 1)',
 		transitionProperty: 'transform, background, width, height',
-		willChange: 'transform, background, width, height',
 	})
 	return node
 }
@@ -67,16 +69,47 @@ class MapExtension {
 		return (new Polygon(args)).addTo(this)
 	}
 
+	// TODO: rework marker to use container as well
+	// TODO: deprecate in favor of v2
 	renderMarker(...args) {
 		var node = args[0] instanceof HTMLElement ? args.shift() : undefined
 		var [coords, color, size] = args
 		if (!node) {
-			if (size === undefined) size = 10
-			node = getNewNode(size, color)
+			if (typeof color === 'object') {
+				node = getNewNode(10, '#000')
+				let style = color
+				Object.assign(node.style, style)
+			} else {
+				if (size === undefined) size = 10
+				node = getNewNode(size, color)
+			}
 		}
 		let marker = new mapboxgl.Marker(node)
 		marker.map = this
 		if (coords) marker.coords = coords
+		return marker
+	}
+	// TODO: replace the main one with this
+	renderMarker2(...args) {
+		var node = args[0] instanceof HTMLElement ? args.shift() : undefined
+		var [coords, color, size] = args
+		if (!node) {
+			if (typeof color === 'object') {
+				node = getNewNode(10, '#000')
+				let style = color
+				console.log('style', style)
+				Object.assign(node.style, style)
+			} else {
+				if (size === undefined) size = 10
+				node = getNewNode(size, color)
+			}
+		}
+		var container = document.createElement('div')
+		container.appendChild(node)
+		var marker = new mapboxgl.Marker(container)
+		marker.map = this
+		if (coords) marker.coords = coords
+		marker.node = node
 		return marker
 	}
 
@@ -92,7 +125,6 @@ class MapExtension {
 		var marker = new mapboxgl.Marker(container)
 		marker.map = this
 		if (coords) marker.coords = coords
-		// overwriting node
 		marker.node = node
 		return marker
 	}

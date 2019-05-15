@@ -244,11 +244,10 @@ export class CompoundItem extends EventEmitter {
 
 	get visible() {
 		return this.layer.visibility !== 'none'
-		return this.layer.getLayoutProperty('visibility') === 'visible'
 	}
 	set visible(value) {
 		if (value === true) value = 'visible'
-		if (value === false) value = 'none'
+		else if (value === false) value = 'none'
 		return this.map.setLayoutProperty(this.id, 'visibility', value)
 	}
 
@@ -261,6 +260,10 @@ export class CompoundItem extends EventEmitter {
 
 	hide() {
 		this.visible = false
+	}
+
+	toggle() {
+		this.visible = !this.visible
 	}
 
 	// EVENTS ////////////////////////////////////////

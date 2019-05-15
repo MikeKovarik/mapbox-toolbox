@@ -11,9 +11,9 @@ const LAYOUT = {
 
 const VARIABLE_WIDTH = [
 	'interpolate', ['linear'], ['zoom'],
-	4, 0.4,
-	15, 4,
-	20, 10,
+	5, 0.5,
+	15, 3,
+	20, 8,
 ]
 
 export class Line extends CompoundItem {
@@ -74,6 +74,13 @@ export class Line extends CompoundItem {
 	}
 	set gradient(stops) {
 		if (Array.isArray(stops)) {
+			if (typeof stops[0] !== 'number') {
+				let step = 1 / (stops.length - 1)
+				stops = stops
+					.map((color, i) => ([step * i, color]))
+					.flat()
+				stops[stops.length - 2] = 1
+			}
 			let gradient = [
 				'interpolate',
 				['linear'],
@@ -81,8 +88,6 @@ export class Line extends CompoundItem {
 				...stops
 			]
 			this.map.setPaintProperty(this.id, 'line-gradient', gradient)
-		} else {
-			// TODO
 		}
 		var opts = this.source.workerOptions.geojsonVtOptions
 		if (!opts.lineMetrics) {
@@ -110,16 +115,18 @@ export class Line extends CompoundItem {
 		return {width, height}
 	}
 
-	get visibleRatios() {
+	get occupiedSpace() {
 		var size = this.renderedSize
 		var width  = size.width  / this.map.effectiveWidth
 		var height = size.height / this.map.effectiveHeight
-		return {width, height}
+		return Math.max(width, height)
 	}
 
 	get visibleRatio() {
-		var {width, height} = this.visibleRatios
-		return Math.max(width, height)
+		var size = this.renderedSize
+		var width  = this.map.effectiveWidth  / size.width
+		var height = this.map.effectiveHeight / size.height
+		return Math.min(width, height)
 	}
 
 }
