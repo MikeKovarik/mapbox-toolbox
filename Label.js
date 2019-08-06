@@ -48,6 +48,10 @@ export class Label extends CompoundItem {
 		return {text, color, size}
 	}
 
+	_createDummy() {
+		return turf.point([])
+	}
+
 	layerOptions = {
 		minzoom: 3,
 	}

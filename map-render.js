@@ -5,6 +5,7 @@ import {Label} from './Label.js'
 //import {Marker} from './Marker.js'
 import {extend} from './util.js'
 import {isCoord, isCoords, isBbox, isGeoJson, createRandomId} from './util.js'
+import {CustomMarker} from './CustomMarker.js'
 
 
 function getNewNode(size, color) {
@@ -69,9 +70,14 @@ class MapExtension {
 		return (new Polygon(args)).addTo(this)
 	}
 
+	renderLines(...args)    {this.renderLine(...args)}
+	renderPoints(...args)   {this.renderPoint(...args)}
+	renderLabels(...args)   {this.renderLabel(...args)}
+	renderPolygons(...args) {this.renderPolygon(...args)}
+
 	// TODO: rework marker to use container as well
 	// TODO: deprecate in favor of v2
-	renderMarker(...args) {
+	renderMarkerLegacy(...args) {
 		var node = args[0] instanceof HTMLElement ? args.shift() : undefined
 		var [coords, color, size] = args
 		if (!node) {
@@ -89,9 +95,12 @@ class MapExtension {
 		if (coords) marker.coords = coords
 		return marker
 	}
+
 	// TODO: replace the main one with this
-	renderMarker2(...args) {
-		var node = args[0] instanceof HTMLElement ? args.shift() : undefined
+	renderMarker(...args) {
+		let node
+		if (args[0] instanceof HTMLElement || (typeof args[0] === 'string' && args[0].startsWith('<')))
+			node = args.shift()
 		var [coords, color, size] = args
 		if (!node) {
 			if (typeof color === 'object') {
@@ -104,13 +113,11 @@ class MapExtension {
 				node = getNewNode(size, color)
 			}
 		}
-		var container = document.createElement('div')
-		container.appendChild(node)
-		var marker = new mapboxgl.Marker(container)
-		marker.map = this
-		if (coords) marker.coords = coords
-		marker.node = node
-		return marker
+		return this.renderHtml(node, coords)
+	}
+
+	renderHtml(node, coords) {
+		return new CustomMarker(node, coords, map)
 	}
 
 	renderImage(url, coords, size) {

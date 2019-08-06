@@ -1,5 +1,5 @@
 import {CompoundItem} from './CompoundItem.js'
-import {isGeoJson, createGetters} from './util.js'
+import {isCoords, createGetters} from './util.js'
 
 /*
 export const POINT_PAINT = {
@@ -20,6 +20,7 @@ export const POINT_PAINT = {
 	"circle-stroke-opacity": .2
 }
 */
+
 export class Point extends CompoundItem {
 
 	static type = 'circle'
@@ -44,8 +45,13 @@ export class Point extends CompoundItem {
 		this['circle-radius'] = value
 	}
 
-	_wrapInGeoJson(coords) {
-		return turf.point(coords)
+	_wrapInGeoJson(arg) {
+		if (isCoords(arg)) {
+			let points = arg.map(coord => turf.point(coord))
+			return turf.featureCollection(points)
+		} else {
+			return turf.point(arg)
+		}
 	}
 
 	_createDummy() {
@@ -71,6 +77,12 @@ export class Point extends CompoundItem {
 		this.data.geometry.coordinates = coords
 		this.update()
 		return this
+	}
+
+	// TODO: api for detection if it's a single point or feature collection of points
+	// investigate name
+	get collection() {
+		return this.data.type === 'FeatureCollection'
 	}
 
 }

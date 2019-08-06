@@ -16,6 +16,8 @@ export var EventEmitter = Evented
 
 export var featuresMap = new WeakMap
 
+export var promiseTimeout = millis => new Promise(resolve => setTimeout(resolve, millis))
+
 export function isGeoJson(arg) {
 	return arg
 		&& arg.type
@@ -62,6 +64,10 @@ export function createRandomId() {
 	return String(new Date().getTime()) + Math.random().toString().slice(2)
 }
 
+export function createRandomId2() {
+	return Math.floor(Math.random() * Number.MAX_SAFE_INTEGER)
+}
+
 
 // paint['line-dasharray'] = [2, 1]
 export const SOLID = undefined
@@ -94,22 +100,28 @@ export function createGetters(Class) {
 	if (Class.paint) {
 		Class.paintKeys = Class.paint.map(sliceFirstSection)
 		Class.paint.forEach((prop, index) => {
-			let key = Class.paintKeys[index]
+			createPaintGetSet(prop, Class.paintKeys[index])
+			createPaintGetSet(prop, prop)
+		})
+		function createPaintGetSet(prop, key) {
 			descriptors[key] = {
 				get() {return this.layer.getPaintProperty(prop)},
 				set(value) {this.map.setPaintProperty(this.id, prop, value)}
 			}
-		})
+		}
 	}
 	if (Class.layout) {
 		Class.layoutKeys = Class.layout.map(sliceFirstSection)
 		Class.layout.forEach((prop, index) => {
-			let key = Class.layoutKeys[index]
+			createLayoutGetSet(prop, Class.layoutKeys[index])
+			createLayoutGetSet(prop, prop)
+		})
+		function createLayoutGetSet(prop, key) {
 			descriptors[key] = {
 				get() {return this.layer.getLayoutProperty(prop)},
 				set(value) {this.map.setLayoutProperty(this.id, prop, value)}
 			}
-		})
+		}
 	}
 	Object.defineProperties(Class.prototype, descriptors)
 }

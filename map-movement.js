@@ -1,4 +1,4 @@
-import {extend, isGeoJson, isCoord, isCoords, isBbox, coordsToBbox} from './util.js'
+import {extend, isGeoJson, isCoord, isCoords, isBbox, coordsToBbox, promiseTimeout} from './util.js'
 
 
 var {Map} = mapboxgl
@@ -30,7 +30,8 @@ class MapExtension {
 	//get lat() {}
 
 	get center() {return this.getCenter().toArray()}
-	set center(center) {this.animate({center})}
+	set center(center) {this._queueAnimation('center', center)}
+	//set center(center) {this.animate({center})}
 	//set center(center) {this.flyTo({center})}
 
 	// basics
@@ -218,7 +219,7 @@ class MapExtension {
 		} else {
 			this.easeTo(mapOptions)
 		}
-		return Promise.timeout(mapOptions.duration)
+		return promiseTimeout(mapOptions.duration)
 	}
 
 	// TODO: one function to rule them all

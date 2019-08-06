@@ -1,4 +1,4 @@
-import {isGeoJson, createRandomId, EventEmitter, featuresMap} from './util.js'
+import {isGeoJson, createRandomId, EventEmitter, featuresMap, promiseTimeout} from './util.js'
 
 
 function isSource(obj) {
@@ -153,10 +153,10 @@ export class CompoundItem extends EventEmitter {
 		var transitionProp = opacityProp + '-transition'
 		this.map.setPaintProperty(this.id, transitionProp, {duration: 0})
 		this.map.setPaintProperty(this.id, opacityProp, 0)
-		await Promise.timeout()
+		await promiseTimeout()
 		this.map.setPaintProperty(this.id, transitionProp, {duration})
 		this.map.setPaintProperty(this.id, opacityProp, 1)
-		return Promise.timeout(duration)
+		return promiseTimeout(duration)
 	}
 
 	async fadeOut(duration = 240) {
@@ -164,12 +164,17 @@ export class CompoundItem extends EventEmitter {
 		var transitionProp = opacityProp + '-transition'
 		this.map.setPaintProperty(this.id, transitionProp, {duration: 0})
 		this.map.setPaintProperty(this.id, opacityProp, 1)
-		await Promise.timeout()
+		await promiseTimeout()
 		this.map.setPaintProperty(this.id, transitionProp, {duration})
 		this.map.setPaintProperty(this.id, opacityProp, 0)
-		return Promise.timeout(duration)
+		return promiseTimeout(duration)
 	}
 
+	apply(...styles) {
+		for (let style of styles)
+			for (let [key, val] of Object.entries(style))
+				this[key] = val
+	}
 	// GEOJSON mimic
 
 	get properties() {
@@ -311,7 +316,7 @@ export class CompoundItem extends EventEmitter {
 
 	onPointDragStart(e) {
 		// giving time to pointer and other more important touchpoints to react to the event
-		//await Promise.timeout()
+		//await promiseTimeout()
 		if (e.defaultPrevented) return
 		// Pinch to zoom gets caught by the touch events of the line sometimes, even though both touch points are outside of the line.
 		// Ignore these multipoint events. 'points' property only appears on touch* events, not on mouse* events.

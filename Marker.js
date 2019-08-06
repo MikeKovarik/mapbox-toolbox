@@ -136,6 +136,7 @@ class MarkerExtension {
 }
 
 Marker.prototype._on = Marker.prototype.on
+Marker.prototype._off = Marker.prototype.off
 Marker.prototype._once = Marker.prototype.once
 Marker.prototype._emit = Marker.prototype.emit
 Marker.prototype._addTo = Marker.prototype.addTo

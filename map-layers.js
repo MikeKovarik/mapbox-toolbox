@@ -1,11 +1,33 @@
-import {extend, createRandomId} from './util.js'
+import {extend, createRandomId, isGeoJson} from './util.js'
 
 
 class MapExtension {
 
 	// creates empty geojson source. empty feature collection by default. should be replaced by user
-	createSource() {
-		return this.addGeoJson()
+	// If data is specified, it should be geojson.
+	// If user inserts array of coords we're not sure if it should be linestring or feature collection of points
+	// use lineSource or pointSource instead
+	createSource(data) {
+		let source = this.addGeoJson()
+		if (data) {
+			if (isGeoJson(data))
+				source.setData(data)
+			else
+				console.warn('createSource() expects geojson')
+		}
+		return source
+	}
+
+	lineSource(data) {
+		if (!isGeoJson(data))
+			data = turf.lineString(data)
+		return this.addGeoJson(data)
+	}
+
+	pointSource(data) {
+		if (!isGeoJson(data))
+			data = turf.lineString(data.map(coord => turf.point(coord)))
+		return this.addGeoJson(data)
 	}
 
 	addGeoJson(data) {
