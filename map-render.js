@@ -5,7 +5,7 @@ import {Label} from './Label.js'
 //import {Marker} from './Marker.js'
 import {extend} from './util.js'
 import {isCoord, isCoords, isBbox, isGeoJson, createRandomId} from './util.js'
-import {CustomMarker} from './CustomMarker.js'
+import {ViewportedMarker} from './CustomMarker.js'
 
 
 function getNewNode(size, color) {
@@ -117,7 +117,7 @@ class MapExtension {
 	}
 
 	renderHtml(node, coords) {
-		return new CustomMarker(node, coords, map)
+		return new ViewportedMarker(node, coords, map)
 	}
 
 	renderImage(url, coords, size) {

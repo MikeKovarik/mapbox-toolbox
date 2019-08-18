@@ -102,12 +102,7 @@ class MapExtension {
 	get cursor() {return this.canvas.style.cursor}
 	set cursor(cursor) {this.canvas.style.cursor = cursor}
 
-	get bounds() {return this.getBounds().toArray().flat()}
-	set bounds(bounds) {
-		console.warn('not implemented')
-	}
-	get bbox() {return this.bounds}
-	set bbox(bbox) {this.bounds = bbox}
+	get bbox() {return this.getBounds().toArray().flat()}
 
 	get canvas() {
 		if (this.__canvas) return this.__canvas

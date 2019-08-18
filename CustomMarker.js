@@ -1,10 +1,14 @@
+import ViewportChecker from './ViewportChecker.js'
 var {Evented, LngLat, Point} = mapboxgl
 
 
-export class CustomMarker extends Evented {
+export class SimpleMarker extends Evented {
 
 	constructor(node, coords, map) {
 		super()
+
+		this._updatePos = this._updatePos.bind(this)
+		this._updatePosRound = this._updatePosRound.bind(this)
 
 		if (typeof node === 'string')
 			node = domNodeFromString(node)
@@ -27,9 +31,9 @@ export class CustomMarker extends Evented {
 	addTo(map) {
 		this.remove()
 		this._map = map
-		map.getCanvasContainer().appendChild(this.container)
-		map.on('move', this._updatePos)
-		map.on('moveend', this._updatePosRound)
+		this._map.getCanvasContainer().appendChild(this.container)
+		this._map.on('move', this._updatePos)
+		this._map.on('moveend', this._updatePosRound)
 
 		this.draggable = this.draggable
 		this._updatePosRound()
@@ -48,6 +52,66 @@ export class CustomMarker extends Evented {
 		this.container.remove()
 		return this
 	}
+
+	// RENDERING
+
+	get coords() {
+		if (this._lngLat === undefined)
+			return this._map.unproject(this._pos).toArray()
+		else
+			return this._lngLat.toArray()
+	}
+
+	set coords(coords) {
+		this._lngLat = LngLat.convert(coords)
+		this._updatePosRound()
+	}
+
+	get x() {
+		return this._pos.x
+	}
+
+	get y() {
+		return this._pos.y
+	}
+
+	get position() {
+		if (this._pos === undefined) {
+			this._pos = this._map.project(this._lngLat).round()
+		}
+		return this._pos
+	}
+
+	_updatePos() {
+		this._pos = this._map.project(this._lngLat)
+		this._renderPos()
+	}
+
+	_updatePosRound() {
+		this._pos = this._map.project(this._lngLat).round()
+		this._renderPos()
+	}
+
+	_renderPos = () => {
+		this.rafPending = false
+		this.container.style.transform = this.transform
+		if (this.debug) {
+			let {x, y} = this._pos
+			this.node.innerText = `${Math.round(x)} ${Math.round(y)}`
+		}
+	}
+
+	get transform() {
+		return `translate(-50%, -50%) translate(${this._pos.x}px, ${this._pos.y}px)`
+	}
+
+	_onClick = e => {
+		// prevent click from bubbling up to map
+		prevent(e)
+		this.emit('click', e)
+	}
+
+	// MANIPULATION
 
 	get draggable() {
 		return this._draggable
@@ -116,40 +180,6 @@ export class CustomMarker extends Evented {
 		}
 	}
 
-	_updatePos = () => {
-		this._pos = this._map.project(this._lngLat)
-		this._renderPos()
-	}
-
-	_updatePosRound = () => {
-		this._pos = this._map.project(this._lngLat)
-		this._pos = this._pos.round()
-		this._renderPos()
-	}
-
-	get coords() {
-		if (this._lngLat === undefined)
-			return this._map.unproject(this._pos).toArray()
-		else
-			return this._lngLat.toArray()
-	}
-
-	set coords(coords) {
-		this._lngLat = LngLat.convert(coords)
-		this._updatePosRound()
-	}
-
-	_renderPos = () => {
-		this.rafPending = false
-		this.container.style.transform = `translate(-50%, -50%) translate(${this._pos.x}px, ${this._pos.y}px)`
-	}
-
-	_onClick = e => {
-		// prevent click from bubbling up to map
-		prevent(e)
-		this.emit('click', e)
-	}
-
 	// EVENTS ////////////////////////////////////////
 
 	static _internalEvents = ['click', 'drag', 'dragstart', 'dragend']
@@ -175,14 +205,65 @@ export class CustomMarker extends Evented {
 			this.node.removeEventListener(name, listener)
 	}
 
+	// VISIBILITY
+
+	show() {
+		//this.container.style.transform = this.transform + ' scale(0)'
+		this.node.style.transition = 'transform 180ms'
+		this.node.style.transform = 'scale(1)'
+	}
+
+	hide() {
+		//this.container.style.transform = this.transform + ' scale(1)'
+		this.node.style.transition = 'transform 180ms'
+		this.node.style.transform = 'scale(0)'
+	}
+
 }
 
 
-CustomMarker.prototype._on    = Evented.prototype.on
-CustomMarker.prototype._off   = Evented.prototype.off
-CustomMarker.prototype._once  = Evented.prototype.once
-CustomMarker.prototype._emit  = Evented.prototype.emit
-CustomMarker.prototype._addTo = Evented.prototype.addTo
+export class ViewportedMarker extends SimpleMarker {
+
+	addTo(map) {
+		if (!map._viewport) map._viewport = new ViewportChecker(map, 20)
+		this._viewport = map._viewport
+		super.addTo(map)
+		return this
+	}
+
+	_viewportVisibilityToggle() {
+		this.inViewport = this._viewport.isInside(this._lngLat.toArray())
+		if (this.wasInViewport && !this.inViewport) {
+			this.wasInViewport = false
+			this.container.style.display = 'none'
+		} else if (!this.wasInViewport && this.inViewport) {
+			this.wasInViewport = true
+			this.container.style.display = ''
+		}
+		if (!this.inViewport) {
+			this._pos = undefined
+		}
+		return this.inViewport
+	}
+
+	_updatePos() {
+		if (!this._viewportVisibilityToggle()) return
+		super._updatePos()
+	}
+
+	_updatePosRound() {
+		if (!this._viewportVisibilityToggle()) return
+		super._updatePosRound()
+	}
+
+}
+
+
+SimpleMarker.prototype._on    = Evented.prototype.on
+SimpleMarker.prototype._off   = Evented.prototype.off
+SimpleMarker.prototype._once  = Evented.prototype.once
+SimpleMarker.prototype._emit  = Evented.prototype.emit
+SimpleMarker.prototype._addTo = Evented.prototype.addTo
 
 function prevent(e) {
 	e.preventDefault()
