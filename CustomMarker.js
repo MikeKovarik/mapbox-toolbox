@@ -4,15 +4,16 @@ var {Evented, LngLat, Point} = mapboxgl
 
 export class SimpleMarker extends Evented {
 
-	constructor(node, coords, map) {
+	constructor(node, ...args) {
 		super()
 
 		this._updatePos = this._updatePos.bind(this)
 		this._updatePosRound = this._updatePosRound.bind(this)
 
 		if (typeof node === 'string')
-			node = domNodeFromString(node)
-		this.node = node
+			this.node = domNodeFromString(node)
+		else
+			this.node = node
 
 		this.container = document.createElement('div')
 		this.container.append(this.node)
@@ -20,12 +21,30 @@ export class SimpleMarker extends Evented {
 		this.container.style.display = 'flex'
 		this.container.classList.add('mapboxgl-marker')
 
-		if (coords) this._lngLat = LngLat.convert(coords)
-
-		if (map) this.addTo(map)
-
-		this._draggable = options && options.draggable || false
+		let options = this._processOptions(args)
+		if (options.coords)
+			this._lngLat = LngLat.convert(options.coords)
+		else if (options.x !== undefined && options.y !== undefined)
+			this.move(options.x, options.y, true)
+		if (options.map) this.addTo(options.map)
 		this.dragging = false
+	}
+
+	_processOptions(args) {
+		let coords
+		let map
+		let options = {}
+		for (let arg of args) {
+			if (arg instanceof mapboxgl.Map)
+				map = arg
+			else if (Array.isArray(arg))
+				coords = arg
+			else
+				options = arg
+		}
+		options.coords = options.coords || coords
+		options.map = options.map || map
+		return options
 	}
 
 	addTo(map) {
@@ -36,7 +55,7 @@ export class SimpleMarker extends Evented {
 		this._map.on('moveend', this._updatePosRound)
 
 		this.draggable = this.draggable
-		this._updatePosRound()
+		if (this._lngLat) this._updatePosRound()
 
 		this.container.addEventListener('click', this._onClick)
 		return this
@@ -67,19 +86,32 @@ export class SimpleMarker extends Evented {
 		this._updatePosRound()
 	}
 
-	get x() {
-		return this._pos.x
-	}
-
-	get y() {
-		return this._pos.y
-	}
-
 	get position() {
 		if (this._pos === undefined) {
 			this._pos = this._map.project(this._lngLat).round()
 		}
 		return this._pos
+	}
+
+	get positionArray() {
+		let {x, y} = this.position
+		return [x, y]
+	}
+
+	get x() {
+		return this.position.x
+	}
+
+	set x(x) {
+		// TODO
+	}
+
+	get y() {
+		return this.position.y
+	}
+
+	set y(y) {
+		// TODO
 	}
 
 	_updatePos() {
@@ -118,6 +150,7 @@ export class SimpleMarker extends Evented {
 	}
 
 	set draggable(shouldBeDraggable) {
+		if (this._draggable === !!shouldBeDraggable) return
 		this._draggable = !!shouldBeDraggable
 		if (!this._map) return
 		if (this._draggable) {
@@ -154,8 +187,10 @@ export class SimpleMarker extends Evented {
 			this.emit('dragend')
 			// prevent rogue click event which happpens after mouseup/pointerup.
 			// it happpens because its triggered on container, but we're listening on document)
-			this.container.addEventListener('click', prevent, {capture: true, once: true})
-			setTimeout(() => this.container.removeEventListener('click', prevent, {capture: true}))
+			let target = document.body
+			//let target = this.container
+			target.addEventListener('click', prevent, {capture: true, once: true})
+			setTimeout(() => target.removeEventListener('click', prevent, {capture: true}))
 		}
 		document.removeEventListener('pointermove', this._onPointerMove)
 		document.removeEventListener('pointerup', this._onPointerUp)
@@ -177,6 +212,16 @@ export class SimpleMarker extends Evented {
 		} else {
 			this.dragging = true
 			this.emit('dragstart')
+		}
+	}
+
+	move(x, y, forceRender = false) {
+		this._pos = new Point(x, y)
+		if (forceRender) {
+			this._renderPos()
+		} else if (!this.rafPending) {
+			this.rafPending = true
+			requestAnimationFrame(this._renderPos)
 		}
 	}
 
@@ -231,8 +276,14 @@ export class ViewportedMarker extends SimpleMarker {
 		return this
 	}
 
+	_isInViewport() {
+	}
+
 	_viewportVisibilityToggle() {
-		this.inViewport = this._viewport.isInside(this._lngLat.toArray())
+		if (this._lngLat === undefined)
+			this.inViewport = false
+		else
+			this.inViewport = this._viewport.isInside(this._lngLat.toArray())
 		if (this.wasInViewport && !this.inViewport) {
 			this.wasInViewport = false
 			this.container.style.display = 'none'

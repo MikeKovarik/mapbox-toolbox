@@ -117,7 +117,7 @@ class MapExtension {
 	}
 
 	renderHtml(node, coords) {
-		return new ViewportedMarker(node, coords, map)
+		return new ViewportedMarker(node, coords, this)
 	}
 
 	renderImage(url, coords, size) {
