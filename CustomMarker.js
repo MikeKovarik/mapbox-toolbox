@@ -269,6 +269,8 @@ export class SimpleMarker extends Evented {
 
 export class ViewportedMarker extends SimpleMarker {
 
+	viewported = true
+
 	addTo(map) {
 		if (!map._viewport) map._viewport = new ViewportChecker(map, 20)
 		this._viewport = map._viewport
@@ -276,10 +278,11 @@ export class ViewportedMarker extends SimpleMarker {
 		return this
 	}
 
-	_isInViewport() {
-	}
-
 	_viewportVisibilityToggle() {
+		// allow to short circuit the viewport visibility check
+		// note: do not shorten false equality to exclamation mark. the property is undefined
+		// at the time of first call becase of class inheritance.
+		if (this.viewported === false) return true
 		if (this._lngLat === undefined)
 			this.inViewport = false
 		else
@@ -289,7 +292,7 @@ export class ViewportedMarker extends SimpleMarker {
 			this.container.style.display = 'none'
 		} else if (!this.wasInViewport && this.inViewport) {
 			this.wasInViewport = true
-			this.container.style.display = ''
+			this.container.style.display = 'flex'
 		}
 		if (!this.inViewport) {
 			this._pos = undefined
