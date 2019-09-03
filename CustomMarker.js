@@ -115,11 +115,13 @@ export class SimpleMarker extends Evented {
 	}
 
 	_updatePos() {
+		if (this._lngLat === undefined) return
 		this._pos = this._map.project(this._lngLat)
 		this._renderPos()
 	}
 
 	_updatePosRound() {
+		if (this._lngLat === undefined) return
 		this._pos = this._map.project(this._lngLat).round()
 		this._renderPos()
 	}
@@ -225,6 +227,15 @@ export class SimpleMarker extends Evented {
 		}
 	}
 
+	moveAndAnchor(...args) {
+		this.move(...args)
+		this.preservePosition()
+	}
+
+	preservePosition() {
+		this.coords = map.unproject(this._pos)
+	}
+
 	// EVENTS ////////////////////////////////////////
 
 	static _internalEvents = ['click', 'drag', 'dragstart', 'dragend']
@@ -278,35 +289,57 @@ export class ViewportedMarker extends SimpleMarker {
 		return this
 	}
 
-	_viewportVisibilityToggle() {
+	_viewportVisibilityUpdate() {
+		if (this._lngLat !== undefined) {
+			return this._viewport.isInside(this._lngLat.toArray())
+		} else if (this._pos !== undefined) {
+			let {x, y} = this._pos
+			return x >= 0
+				&& y >= 0
+				&& x <= this._map.width
+				&& y <= this._map.height
+		} else {
+			console.warn('checking availability of marker without _pos and _lngLat', this)
+			return true
+		}
+	}
+
+	_viewportVisibilityReflect() {
 		// allow to short circuit the viewport visibility check
 		// note: do not shorten false equality to exclamation mark. the property is undefined
 		// at the time of first call becase of class inheritance.
 		if (this.viewported === false) return true
-		if (this._lngLat === undefined)
-			this.inViewport = false
-		else
-			this.inViewport = this._viewport.isInside(this._lngLat.toArray())
+		//if (this._lngLat === undefined && this._pos === undefined) return true
+		this.inViewport = this._viewportVisibilityUpdate()
 		if (this.wasInViewport && !this.inViewport) {
 			this.wasInViewport = false
 			this.container.style.display = 'none'
+			this._pos = undefined
 		} else if (!this.wasInViewport && this.inViewport) {
 			this.wasInViewport = true
 			this.container.style.display = 'flex'
 		}
-		if (!this.inViewport) {
-			this._pos = undefined
+	}
+
+	get position() {
+		if (this._pos === undefined) {
+			if (this.inViewport)
+				this._pos = this._map.project(this._lngLat).round()
+			else
+				return this._map.project(this._lngLat).round()
 		}
-		return this.inViewport
+		return this._pos
 	}
 
 	_updatePos() {
-		if (!this._viewportVisibilityToggle()) return
+		this._viewportVisibilityReflect()
+		if (!this.inViewport) return
 		super._updatePos()
 	}
 
 	_updatePosRound() {
-		if (!this._viewportVisibilityToggle()) return
+		this._viewportVisibilityReflect()
+		if (!this.inViewport) return
 		super._updatePosRound()
 	}
 
