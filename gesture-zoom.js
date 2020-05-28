@@ -1,2 +1,0 @@
-// doubleClickZoom
-map.doubleTapDragZoom
