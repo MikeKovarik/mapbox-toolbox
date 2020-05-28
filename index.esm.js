@@ -1,4 +1,5 @@
 export var {Map} = mapboxgl
+import './map-gestures.js'
 import './map-layers.js'
 import './map-movement.js'
 import './map-render.js'

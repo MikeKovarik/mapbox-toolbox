@@ -169,9 +169,11 @@ export class SimpleMarker extends Evented {
 	_onPointerDown = e => {
 		// prevent events from reaching map (map would pan)
 		prevent(e)
-		console.log('_onPointerDown', e.pointerId, e.pointerType)
 		this.dragging = true
 		this.dragPointerId = e.pointerId
+		// Ignore map manipulation during dragging - multiple fingers can touch the screen and cause gestures.
+		map.cacheGestures()
+		map.disableGestures()
 		// calculate diff between cursor position and marker center/anchor
 		this._nodeCenterDelta = (new Point(e.x, e.y)).sub(this._pos)
 		// remove internal lnglat because it won't be kept up to date while dragging.
@@ -184,11 +186,12 @@ export class SimpleMarker extends Evented {
 	}
 
 	_onPointerUp = e => {
-		// first ignore addiotional fingers (in touch)
+		// first ignore additional fingers (in touch)
 		if (e.pointerId !== this.dragPointerId) return
-		// TODO: ignore map manipulation during dragging - multiple fingers can touch the screen and cause gestures.
-		// prevent events from reaching map
 		prevent(e)
+		// clear and restore
+		this.dragPointerId = undefined
+		map.restoreGestures()
 		// convert current pixel position back to geo coordinates
 		this.coords = this._map.unproject(this._pos)
 		// emit user facing events and fix internal state
@@ -208,13 +211,12 @@ export class SimpleMarker extends Evented {
 	}
 
 	_onPointerMove = e => {
-		// first ignore addiotional fingers (in touch)
-		// NOTE: if second finger starts touching screen while dragging, the second finger events
+		// first ignore additional fingers (in touch)
+		// NOTE: If second finger starts touching screen while dragging, the second finger events
 		// are emitted on the same target (marker) as the first finger - and need to be ignored.
 		if (e.pointerId !== this.dragPointerId) return
 		// prevent events from reaching map
 		prevent(e)
-		console.log('_onPointerMove', e.pointerId, e.pointerType)
 		// store current cursor position, shifted by a few pixels off markers center
 		this._pos = (new Point(e.x, e.y)).sub(this._nodeCenterDelta)
 		// request rendering in next animation frame (ensures 60fps)
