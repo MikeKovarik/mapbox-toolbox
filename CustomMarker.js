@@ -170,6 +170,8 @@ export class SimpleMarker extends Evented {
 		// prevent events from reaching map (map would pan)
 		prevent(e)
 		console.log('_onPointerDown', e.pointerId, e.pointerType)
+		this.dragging = true
+		this.dragPointerId = e.pointerId
 		// calculate diff between cursor position and marker center/anchor
 		this._nodeCenterDelta = (new Point(e.x, e.y)).sub(this._pos)
 		// remove internal lnglat because it won't be kept up to date while dragging.
@@ -177,9 +179,14 @@ export class SimpleMarker extends Evented {
 		// start listening on global events because we'd loose the node when dragging it
 		document.addEventListener('pointermove', this._onPointerMove)
 		document.addEventListener('pointerup', this._onPointerUp)
+		// trigger user facing events
+		this.emit('dragstart')
 	}
 
 	_onPointerUp = e => {
+		// first ignore addiotional fingers (in touch)
+		if (e.pointerId !== this.dragPointerId) return
+		// TODO: ignore map manipulation during dragging - multiple fingers can touch the screen and cause gestures.
 		// prevent events from reaching map
 		prevent(e)
 		// convert current pixel position back to geo coordinates
@@ -192,14 +199,19 @@ export class SimpleMarker extends Evented {
 			// it happpens because its triggered on container, but we're listening on document)
 			let target = document.body
 			//let target = this.container
-			target.addEventListener('click', prevent, {capture: true, once: true})
-			setTimeout(() => target.removeEventListener('click', prevent, {capture: true}))
+			let eventOptions = {capture: true, once: true}
+			target.addEventListener('click', prevent, eventOptions)
+			setTimeout(() => target.removeEventListener('click', prevent, eventOptions))
 		}
 		document.removeEventListener('pointermove', this._onPointerMove)
 		document.removeEventListener('pointerup', this._onPointerUp)
 	}
 
 	_onPointerMove = e => {
+		// first ignore addiotional fingers (in touch)
+		// NOTE: if second finger starts touching screen while dragging, the second finger events
+		// are emitted on the same target (marker) as the first finger - and need to be ignored.
+		if (e.pointerId !== this.dragPointerId) return
 		// prevent events from reaching map
 		prevent(e)
 		console.log('_onPointerMove', e.pointerId, e.pointerType)
@@ -211,12 +223,7 @@ export class SimpleMarker extends Evented {
 			requestAnimationFrame(this._renderPos)
 		}
 		// trigger user facing events
-		if (this.dragging) {
-			this.emit('drag')
-		} else {
-			this.dragging = true
-			this.emit('dragstart')
-		}
+		this.emit('drag')
 	}
 
 	move(x, y, forceRender = false) {
