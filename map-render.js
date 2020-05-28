@@ -70,10 +70,45 @@ class MapExtension {
 		return (new Polygon(args)).addTo(this)
 	}
 
+	renderSquare(...args) {
+		return (new Polygon(args)).addTo(this)
+	}
+
+	renderCircle(...args) {
+		// todo
+	}
+
 	renderLines(...args)    {this.renderLine(...args)}
-	renderPoints(...args)   {this.renderPoint(...args)}
 	renderLabels(...args)   {this.renderLabel(...args)}
 	renderPolygons(...args) {this.renderPolygon(...args)}
+
+	renderPoints(arg, options) {
+		let sourceId
+		let layerId
+		if (typeof arg === 'string') {
+			sourceId = arg
+			layerId = Math.random().toString()
+		} else {
+			sourceId = Math.random().toString()
+			layerId = sourceId
+			map.addSource(sourceId, {
+				'type': 'geojson',
+				'data': arg
+			})
+		}
+		let layer = {
+			id: layerId,
+			source: sourceId,
+			type: 'circle',
+			paint: {
+				'circle-radius': options.size || options.radius,
+				'circle-color': options.color,
+			},
+		}
+		if (options.filter) layer.filter = options.filter
+		map.addLayer(layer)
+		return layerId
+	}
 
 	// TODO: rework marker to use container as well
 	// TODO: deprecate in favor of v2

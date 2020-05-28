@@ -169,6 +169,7 @@ export class SimpleMarker extends Evented {
 	_onPointerDown = e => {
 		// prevent events from reaching map (map would pan)
 		prevent(e)
+		console.log('_onPointerDown', e.pointerId, e.pointerType)
 		// calculate diff between cursor position and marker center/anchor
 		this._nodeCenterDelta = (new Point(e.x, e.y)).sub(this._pos)
 		// remove internal lnglat because it won't be kept up to date while dragging.
@@ -201,6 +202,7 @@ export class SimpleMarker extends Evented {
 	_onPointerMove = e => {
 		// prevent events from reaching map
 		prevent(e)
+		console.log('_onPointerMove', e.pointerId, e.pointerType)
 		// store current cursor position, shifted by a few pixels off markers center
 		this._pos = (new Point(e.x, e.y)).sub(this._nodeCenterDelta)
 		// request rendering in next animation frame (ensures 60fps)
@@ -227,6 +229,7 @@ export class SimpleMarker extends Evented {
 		}
 	}
 
+	// Move to pixel xy position, calculate pixels to lonlat and from now on use that for positioning instead of pixels.
 	moveAndAnchor(...args) {
 		this.move(...args)
 		this.preservePosition()

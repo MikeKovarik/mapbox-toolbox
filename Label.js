@@ -2,6 +2,8 @@ import {CompoundItem} from './CompoundItem.js'
 import {isGeoJson, createGetters, isCoord, isCoords} from './util.js'
 
 
+// TODO: enable rendering label without base style - https://github.com/mapbox/mapbox-gl-js/issues/4808
+
 export class Label extends CompoundItem {
 
 	static type = 'symbol'
@@ -45,7 +47,7 @@ export class Label extends CompoundItem {
 	}
 
 	_createOptionsFromArgs(text, color, size) {
-		return {text, color, size}
+		return {field: text, color, size}
 	}
 
 	_createDummy() {

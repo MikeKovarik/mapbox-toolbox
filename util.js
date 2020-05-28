@@ -48,12 +48,12 @@ export function coordsToBbox(coords) {
 	return bounds
 }
 
-function isFlatBbox(arr) {
+export function isFlatBbox(arr) {
 	return arr.length === 4
 		&& typeof arr[0] === 'number'
 }
 
-function isNestedBbox(arr) {
+export function isNestedBbox(arr) {
 	return arr.length === 2
 		&& arr[0].length === 2
 		&& arr[1].length === 2

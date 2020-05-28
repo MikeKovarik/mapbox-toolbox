@@ -1,5 +1,6 @@
 import {CompoundItem} from './CompoundItem.js'
 import {isGeoJson, createGetters} from './util.js'
+import * as geolib from './geolib.js'
 
 
 export class Polygon extends CompoundItem {
@@ -20,7 +21,7 @@ export class Polygon extends CompoundItem {
 			if (arg.length === 4 && typeof arg[0] === 'number')
 				return turf.bboxPolygon(arg)
 			else
-				return turf.polygon(arg)
+				return geolib.polygon(arg)
 		}
 		console.warn('unknown polygon data')
 	}
