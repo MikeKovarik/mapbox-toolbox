@@ -172,7 +172,6 @@ export class SimpleMarker extends Evented {
 		this.dragging = true
 		this.dragPointerId = e.pointerId
 		// Ignore map manipulation during dragging - multiple fingers can touch the screen and cause gestures.
-		map.cacheGestures()
 		map.disableGestures()
 		// calculate diff between cursor position and marker center/anchor
 		this._nodeCenterDelta = (new Point(e.x, e.y)).sub(this._pos)
@@ -302,18 +301,13 @@ export class ViewportedMarker extends SimpleMarker {
 	}
 
 	_viewportVisibilityUpdate() {
-		if (this._lngLat !== undefined) {
-			return this._viewport.isInside(this._lngLat.toArray())
-		} else if (this._pos !== undefined) {
-			let {x, y} = this._pos
-			return x >= 0
-				&& y >= 0
-				&& x <= this._map.width
-				&& y <= this._map.height
-		} else {
+		if (this._lngLat !== undefined)
+			return this._viewport.isPointInsideLngLat(this._lngLat.toArray())
+		else if (this._pos !== undefined)
+			return this._viewport.isPointInsidePx(this._pos)
+		else
 			console.warn('checking availability of marker without _pos and _lngLat', this)
-			return true
-		}
+		return true
 	}
 
 	_viewportVisibilityReflect() {

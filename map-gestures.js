@@ -22,16 +22,40 @@ class MapExtension {
 		}
 	}
 
-	cacheGestures() {
-		this._previousGestureState = this.getGestureState()
+	_ensureGestureCounter() {
+		if (this._gestureCacheCounter === undefined)
+			this._gestureCacheCounter = 0
+	}
+
+	disableGestures(force = false) {
+		// WARNING: disable may be called multiple times before restoring.
+		// for example (in multitouch with every finger's touchstart).
+		// This keeps track of how many times disable was called.
+		// Only disable and create snapshot on the first disable.
+		if (force) {
+			// only disable
+			this._previousGestureState = undefined
+			this._gestureCacheCounter = 0
+			this._disableGestures()
+		} else {
+			this._ensureGestureCounter()
+			// warning: do not change the incrementation from prefix to suffix!
+			if (++this._gestureCacheCounter == 1) {
+				// cache and disable
+				this._previousGestureState = this.getGestureState()
+				this._disableGestures()
+			}
+		}
 	}
 
 	restoreGestures() {
-		this.setGesturesState(this._previousGestureState)
+		this._ensureGestureCounter()
+		if (--this._gestureCacheCounter === 0) {
+			this.setGesturesState(this._previousGestureState)
+		}
 	}
 
-	disableGestures(cache = false) {
-		if (cache) this.cacheGestures()
+	_disableGestures() {
 		let state = {}
 		for (let key of gestureKeys) state[key] = false
 		this.setGesturesState(state)
