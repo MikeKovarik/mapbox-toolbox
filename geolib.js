@@ -10,15 +10,22 @@
 
 import {isFlatBbox, isNestedBbox} from './util.js'
 
-export function point(coord, properties) {
+function feature(type, coordinates, properties) {
 	let geojson = {
 		type: 'Feature',
-		geometry: {
-			type: 'Point',
-			coordinates: coord
-		}
+		geometry: {type, coordinates}
 	}
-	return enrichGeoJson(geojson, properties)
+	if (properties)
+		geojson.properties = Object.assign({}, properties)
+	return geojson
+}
+
+export function lineString(coords, properties) {
+	return feature('LineString', coords, properties)
+}
+
+export function point(coord, properties) {
+	return feature('Point', coord, properties)
 }
 
 export function polygon(coords, properties) {
@@ -28,15 +35,8 @@ export function polygon(coords, properties) {
 	let lastCoord = coords[coords.length - 1]
 	if (firstCoord[0] !== lastCoord[0] || firstCoord[1] !== lastCoord[1])
 		coords.push(firstCoord)
-	let geojson = {
-		type: 'Feature',
-		geometry: {
-			type: 'Polygon',
-			// yes, two nested arrays. what a stupid format.
-			coordinates: [coords]
-		}
-	}
-	return enrichGeoJson(geojson, properties)
+	// yes, two nested arrays. what a stupid format.
+	return feature('Polygon', [coords], properties)
 }
 
 export function bboxCenter(bbox) {
@@ -48,10 +48,4 @@ export function bboxCenter(bbox) {
 	let lon = ((right - left) / 2) + left
 	let lat = ((bottom - top) / 2) + top
 	return [lon, lat]
-}
-
-function enrichGeoJson(geojson, properties) {
-	if (properties)
-		geojson.properties = Object.assign({}, properties)
-	return geojson
 }

@@ -13,6 +13,7 @@ export class ViewportChecker {
 		map.off('remove', this.destroy)
 	}
 
+	// TODO: handle not only angle (bearing) but tilt as well
 	recalculate = () => {
 		let zero = -this.offset
 		let w = this.map.transform.width  + this.offset
@@ -55,10 +56,17 @@ export class ViewportChecker {
 		]
 	}
 
-	isInside(coords) {
-		let [lon, lat] = coords
+	// tests if point is inside viewport
+	isPointInsideLngLat([lon, lat]) {
 		return this.left < lon && lon < this.right 
 			&& this.top  < lat && lat < this.bottom
+	}
+
+	isPointInsidePx({x, y}) {
+		return x >= 0
+			&& y >= 0
+			&& x <= this.map.width
+			&& y <= this.map.height
 	}
 
 }

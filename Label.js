@@ -1,5 +1,6 @@
 import {CompoundItem} from './CompoundItem.js'
 import {isGeoJson, createGetters, isCoord, isCoords} from './util.js'
+import * as create from './geolib.js'
 
 
 // TODO: enable rendering label without base style - https://github.com/mapbox/mapbox-gl-js/issues/4808
@@ -39,7 +40,7 @@ export class Label extends CompoundItem {
 	_wrapInGeoJson(arg) {
 		if (isCoord(arg)) return turf.point(arg)
 		if (isCoords(arg)) {
-			var line = turf.lineString(arg)
+			var line = create.lineString(arg)
 			var length = turf.length(line)
 			return turf.along(line, length / 2)
 		}
@@ -51,7 +52,7 @@ export class Label extends CompoundItem {
 	}
 
 	_createDummy() {
-		return turf.point([])
+		return create.point([])
 	}
 
 	layerOptions = {

@@ -1,6 +1,8 @@
 import {CompoundItem} from './CompoundItem.js'
 import {createGetters, getStyle} from './util.js'
 import {DASHED, DOTTED, SOLID} from './util.js'
+import * as create from './geolib.js'
+
 
 // TODO: reimplement dashes/dotted line styles
 
@@ -37,7 +39,7 @@ export class Line extends CompoundItem {
 	}
 
 	_wrapInGeoJson(coords) {
-		return turf.lineString(coords)
+		return create.lineString(coords)
 	}
 
 	_createDummy() {
@@ -61,11 +63,9 @@ export class Line extends CompoundItem {
 	}
 
 	set dashed(bool) {
-		console.log('set dashed', bool)
 		this['line-dasharray'] = bool ? DASHED : SOLID
 	}
 	set dotted(bool) {
-		console.log('set dotted', bool)
 		this['line-dasharray'] = bool ? DOTTED : SOLID
 	}
 
